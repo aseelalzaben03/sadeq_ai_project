@@ -34,8 +34,8 @@ class ArabBERTAgent:
     def __init__(self):
         model_path = "Aseelalzaben03/sadaqai-bestmodel"
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.tokenizer = AutoTokenizer.from_pretrained(model_path)
-        self.model = AutoModelForSequenceClassification.from_pretrained(model_path).to(self.device)
+        self.tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+        self.model = AutoModelForSequenceClassification.from_pretrained(model_path, trust_remote_code=True).to(self.device)
         self.label_map = {0: "real", 1: "fake"}
 
     def analyze_text(self, text: str) -> dict:
