@@ -34,7 +34,7 @@ def detect_language(text):
 # --------- ArabBERT Agent ---------
 class ArabBERTAgent:
     def __init__(self):
-        model_path = "models/best_model"  # مسار النموذج المدرب
+       model_path = "Aseelalzaben03/sadaqai-bestmodel"# مسار النموذج المدرب
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.tokenizer = AutoTokenizer.from_pretrained(model_path)
         self.model = AutoModelForSequenceClassification.from_pretrained(model_path).to(self.device)
