@@ -1,4 +1,5 @@
 from app.agents import ArabBERTAgent, WebSearchAgent, combine_results
+from fastapi import FastAPI
 
 app = FastAPI()
 
