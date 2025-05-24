@@ -1,12 +1,12 @@
 fastapi
 uvicorn[standard]
-torch>=1.13.0
-transformers>=4.30.0
-sentence-transformers>=2.2.2
-googlesearch-python>=1.1.0
-beautifulsoup4>=4.12.2
-langdetect>=1.0.9
-scikit-learn>=1.2.2
-requests>=2.31.0
+transformers
+sentence-transformers
+torch
+beautifulsoup4
+requests
+langdetect
+scikit-learn
+googlesearch-python
 
 
