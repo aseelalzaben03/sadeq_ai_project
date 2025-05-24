@@ -35,10 +35,10 @@ def detect_language(text):
 class ArabBERTAgent:
     def __init__(self):
        model_path = "Aseelalzaben03/sadaqai-bestmodel"# مسار النموذج المدرب
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.tokenizer = AutoTokenizer.from_pretrained(model_path)
-        self.model = AutoModelForSequenceClassification.from_pretrained(model_path).to(self.device)
-        self.label_map = {0: "real", 1: "fake"}
+       self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+       self.tokenizer = AutoTokenizer.from_pretrained(model_path)
+       self.model = AutoModelForSequenceClassification.from_pretrained(model_path).to(self.device)
+       self.label_map = {0: "real", 1: "fake"}
 
     def analyze_text(self, text: str) -> dict:
         inputs = self.tokenizer(text, return_tensors="pt", truncation=True, padding=True).to(self.device)
