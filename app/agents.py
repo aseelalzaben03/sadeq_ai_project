@@ -6,10 +6,8 @@ from sentence_transformers import SentenceTransformer, util
 from googlesearch import search
 from bs4 import BeautifulSoup
 from langdetect import detect
-import re
-import string
-import time
-import requests
+import re, string, time, requests
+from functools import lru_cache
 
 # --------- تنظيف النص ---------
 class TextCleaner:
@@ -34,14 +32,14 @@ def detect_language(text):
 # --------- ArabBERT Agent ---------
 class ArabBERTAgent:
     def __init__(self):
-       model_path = "Aseelalzaben03/sadaqai-bestmodel"# مسار النموذج المدرب
-       self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-       self.tokenizer = AutoTokenizer.from_pretrained(model_path)
-       self.model = AutoModelForSequenceClassification.from_pretrained(model_path).to(self.device)
-       self.label_map = {0: "real", 1: "fake"}
+        model_path = "Aseelalzaben03/sadaqai-bestmodel"
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.tokenizer = AutoTokenizer.from_pretrained(model_path)
+        self.model = AutoModelForSequenceClassification.from_pretrained(model_path).to(self.device)
+        self.label_map = {0: "real", 1: "fake"}
 
     def analyze_text(self, text: str) -> dict:
-        inputs = self.tokenizer(text, return_tensors="pt", truncation=True, padding=True).to(self.device)
+        inputs = self.tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=512).to(self.device)
         with torch.no_grad():
             outputs = self.model(**inputs)
             probs = torch.softmax(outputs.logits, dim=1).squeeze()
@@ -67,15 +65,15 @@ class GoogleSearch:
                 text = ' '.join(p.get_text(strip=True) for p in paragraphs)
                 return text[:1500]
         except:
-            pass
+            return ""
         return ""
 
     def search(self, query, lang='ar'):
         results = {}
         try:
-            urls = search(query, lang=lang, num_results=5)
+            urls = search(query, lang=lang, num_results=3)  # قلل العدد لتقليل الاستخدام
             for url in urls:
-                time.sleep(2)
+                time.sleep(1)
                 content = self.get_page_text(url)
                 if content:
                     results[url] = content
@@ -83,15 +81,19 @@ class GoogleSearch:
             print(f"Search error: {e}")
         return results
 
+# --------- تحميل النموذج مرة واحدة فقط ---------
+@lru_cache()
+def get_sentence_model():
+    return SentenceTransformer("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+
 class WebSearchAgent:
     def __init__(self):
         self.searcher = GoogleSearch()
         self.cleaner = TextCleaner()
-        self.bert_model = SentenceTransformer("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+        self.bert_model = get_sentence_model()
 
     def extract_keywords(self, text, lang, top_k=5):
-        cleaner = TextCleaner()
-        cleaned_text = cleaner.clean_text(text)
+        cleaned_text = self.cleaner.clean_text(text)
         stopwords = ['في', 'من', 'على', 'و', 'عن', 'إلى', 'التي', 'الذي', 'أن', 'إن', 'كان', 'كما', 'لذلك', 'لكن',
                      'أو', 'ما', 'لا', 'لم', 'لن', 'قد', 'هذا', 'هذه', 'هو', 'هي', 'هم', 'ثم', 'كل', 'هناك', 'بعد'] \
             if lang == 'ar' else \
@@ -160,4 +162,3 @@ def combine_results(result1: dict, result2: dict) -> dict:
         "final_confidence": best["confidence"],
         "details": [result1, result2]
     }
-
