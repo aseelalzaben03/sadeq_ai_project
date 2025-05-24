@@ -6,6 +6,8 @@ from app.agents import ArabBERTAgent, WebSearchAgent, combine_results
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 import os
+from app.initial import tokenizer, model
+
 
 app = FastAPI()  # إنشاء التطبيق مرة واحدة فقط
 
