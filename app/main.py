@@ -1,8 +1,12 @@
+# main.py
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from typing import Optional
 from app.agents import ArabBERTAgent, WebSearchAgent, combine_results
-from fastapi import FastAPI
 
 app = FastAPI()
 
+# تحميل العوامل مرة واحدة فقط (لتقليل استهلاك الموارد)
 arabbert_agent = ArabBERTAgent()
 websearch_agent = WebSearchAgent()
 
@@ -21,4 +25,5 @@ async def analyze(input_data: InputData):
         websearch_result = websearch_agent.search_url(input_data.input_url)
         return {"type": "url", "result": websearch_result}
     else:
-        raise HTTPException(status_code=400, detail="Provide input_text or input_url")
+        raise HTTPException(status_code=400, detail="Please provide either input_text or input_url.")
+
