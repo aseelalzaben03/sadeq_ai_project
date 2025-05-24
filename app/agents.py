@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 from langdetect import detect
 import re, string, time, requests
 from functools import lru_cache
+from app.initial import tokenizer, model
 
 # --------- تنظيف النص ---------
 class TextCleaner:
